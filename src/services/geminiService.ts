@@ -46,7 +46,7 @@ export class GeminiService {
     private model: any = null;
     private static interpretationCache: Record<string, any> = {};
 
-    constructor(apiKey: string, modelName: string = 'gemini-2.5-flash') {
+    constructor(apiKey: string, modelName: string = 'gemini-1.5-flash') {
         if (apiKey) {
             try {
                 this.genAI = new GoogleGenerativeAI(apiKey);
@@ -60,8 +60,8 @@ export class GeminiService {
     }
 
     private normalizeModelName(name: string): string {
-        // Favor gemini-2.5-flash as the newly verified standard
-        if (!name || name.includes('1.5') || name.includes('2.0')) return 'gemini-2.5-flash';
+        // Use the requested model, defaulting to 1.5-flash if none provided
+        if (!name) return 'gemini-1.5-flash';
         return name;
     }
 
