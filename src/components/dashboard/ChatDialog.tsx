@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAIEmployeeStore, type AIEmployee } from '@/store/aiEmployeeStore';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, User, Bot, Loader2 } from 'lucide-react';
@@ -50,6 +50,7 @@ export function ChatDialog({ employee, open, onOpenChange }: ChatDialogProps) {
                     <div>
                         <DialogTitle className="text-white text-base">{employee.name}</DialogTitle>
                         <p className="text-xs text-green-500 font-medium">Assistant Online</p>
+                        <DialogDescription className="sr-only">Chat with {employee.name}</DialogDescription>
                     </div>
                 </DialogHeader>
 

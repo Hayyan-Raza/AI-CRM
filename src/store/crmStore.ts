@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Lead, Deal, Task, Activity, AIInsight, Conversation, DashboardStats, PipelineStats } from '@/types';
 import { supabase } from '@/supabase';
+import { useAuthStore } from '@/store/authStore';
 
 interface CRMState {
   // Data
@@ -160,6 +161,18 @@ export const useCRMStore = create<CRMState>()(
       fetchData: async () => {
         set({ isLoading: true });
         try {
+          const authStore = useAuthStore.getState();
+          const companyId = authStore.company?.id;
+
+          // Helper to apply company filter if exists
+          const withCompany = (query: any) => {
+            // Only filter if we have a valid UUID-like company ID
+            if (companyId && companyId !== 'default-company') {
+              return query.eq('company_id', companyId);
+            }
+            return query;
+          };
+
           const [
             { data: leads },
             { data: deals },
@@ -168,12 +181,12 @@ export const useCRMStore = create<CRMState>()(
             { data: insights },
             { data: conversations }
           ] = await Promise.all([
-            supabase.from('leads').select('*').order('created_at', { ascending: false }),
-            supabase.from('deals').select('*').order('created_at', { ascending: false }),
-            supabase.from('tasks').select('*').order('due_date', { ascending: true }),
-            supabase.from('activities').select('*').order('created_at', { ascending: false }),
-            supabase.from('ai_insights').select('*').order('created_at', { ascending: false }),
-            supabase.from('conversations').select('*').order('created_at', { ascending: false })
+            withCompany(supabase.from('leads').select('*').order('created_at', { ascending: false })),
+            withCompany(supabase.from('deals').select('*').order('created_at', { ascending: false })),
+            withCompany(supabase.from('tasks').select('*').order('due_date', { ascending: true })),
+            withCompany(supabase.from('activities').select('*').order('created_at', { ascending: false })),
+            withCompany(supabase.from('ai_insights').select('*').order('created_at', { ascending: false })),
+            withCompany(supabase.from('conversations').select('*').order('created_at', { ascending: false }))
           ]);
 
           set({
